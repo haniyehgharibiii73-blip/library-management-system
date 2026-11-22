@@ -46,8 +46,22 @@ class Member:
             print(f"{book.title} was borrowed successfully!") 
         else:
             print(f"{book.title} was not availble")
+
+
+    def return_book(self,book):
+        if book in self.borrowed_books:
+            
+            book.is_available = True
+            self.borrowed_books.remove(book)
+            print(f"{book.title} returned successfully")
+        else:
+            print(f"you havent borrowed {book.title}")
+            book.is_available = False
+
 member1=Member("hanie", 101)
 print(member1.name)
 
 member1.borrow_book(book1)
 print(member1.borrowed_books)
+member1.return_book(book1)
+
