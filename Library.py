@@ -95,7 +95,19 @@ class Library:
             if book.title == title:
                 return book
         return None
+    def search_book(self, keyword):
+        for book in self.books:
+            if keyword in book.title:
+                return book
+        return None
 
+    def remove_book(self, title):
+        for book in self.books:
+            if book.title == title:
+                self.books.remove(book)
+                return True
+        return False
+    
 library=Library()
 library.add_book(book1)
 library.add_book(book1)
@@ -113,3 +125,14 @@ print(member.name)
 found_book=library.find_book("python basic")
 print(found_book.title)
 print(library.find_book("Unknown"))
+
+search_book=library.search_book("python")
+
+if search_book is not None:
+    print(search_book.title)
+else:
+    print("Book not found") 
+
+
+remove_book=library.remove_book("python basic")
+print(remove_book)
