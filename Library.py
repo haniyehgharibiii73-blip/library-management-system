@@ -65,3 +65,51 @@ member1.borrow_book(book1)
 print(member1.borrowed_books)
 member1.return_book(book1)
 
+class Library:
+    def __init__ (self):
+       self.books= []
+       self.members =[]
+    
+    def add_book(self, book):
+        if book in self.books:
+            print("already book exists")
+        else:
+            self.books.append(book)
+            print("the book add seccessfully")
+
+    def add_member(self, member):
+        if member in self.members:
+            print("This member already exists")
+        else:
+            self.members.append(member)
+            print("Member added successfully")
+
+    def find_member(self, member_id):
+        for member in self.members:
+            if member.member_id == member_id:
+                return member
+            else:
+                return None
+    def find_book(self, title):
+        for book in self.books:
+            if book.title == title:
+                return book
+        return None
+
+library=Library()
+library.add_book(book1)
+library.add_book(book1)
+
+for book in library.books:
+    print(book.title)
+print(library.books)
+
+library.add_member(member1)
+library.add_member(member1)
+
+member=library.find_member(101)
+print(member.name)
+
+found_book=library.find_book("python basic")
+print(found_book.title)
+print(library.find_book("Unknown"))
