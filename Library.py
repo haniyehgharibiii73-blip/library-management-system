@@ -107,6 +107,19 @@ class Library:
                 self.books.remove(book)
                 return True
         return False
+
+    def remove_member(self, memeber_id):
+        for member in self.members:
+            if member.member_id == memeber_id:
+                 if member.borrowed_books:
+                    print("You must return your borrowed books first!")
+                    return False
+
+                 self.members.remove(member)
+                 print(f"{member.member_id} removed")
+                 return True
+        return False
+
     
 library=Library()
 library.add_book(book1)
@@ -136,3 +149,8 @@ else:
 
 remove_book=library.remove_book("python basic")
 print(remove_book)
+
+test_member= Member("test", 999)
+library.add_member(test_member)
+test_member.borrow_book(book1)
+print(library.remove_member(999))
