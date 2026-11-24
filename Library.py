@@ -1,69 +1,70 @@
 class Book:
     def __init__(self, title, author, is_available = True):
-        self.title = title
-        self.author = author
+        if not title.strip():
+            raise ValueError("Book title cannot be empty")
+
+        if not author.strip():
+            raise ValueError ("Book author cannot be empty")
+
+        self.title = title.strip()
+        self.author = author.strip()
         self.is_available =is_available
         
     def display_info(self):
         print(f"title: {self.title}\nauthor: {self.author}\navailable: {self.is_available}")
         
     def borrow(self):
-        if self.is_available == True:
+        if self.is_available:
             print(f"we have a {self.title} book")
             self.is_available = False
+            return True
         else:
             print(f"we have not a {self.title} book")
+            return False
             
     def return_book(self):
-        if self.is_available == False:
+        if not self.is_available:
             print(f"{self.title} Book returned successfully")
             self.is_available = True
-        else:
-            print(f"{self.title} Book is already available")
+            return True
+
+        print(f"{self.title} Book is already available")
+        return False
             
             
-book1=Book("python basic", "john", True)
-book1.display_info()
-book1.borrow()
-book1.return_book()
-book2=Book("java", "hanie", True)
-book2.display_info()
-book2.borrow()
-book3=Book("c", "hamed", True)
-book3.display_info()
-book3.borrow()
 
 class Member:
     def __init__(self, name, member_id):
-        self.name = name
+
+        if not name.strip():
+            raise ValueError("Member name cannot be empty!")
+
+        if type(member_id) is not int or member_id <= 0:
+            raise ValueError("Member ID must be a positive integer!")
+        
+        self.name = name.strip()
         self.member_id = member_id
         self.borrowed_books=[]
         
     def borrow_book(self, book):
-        if book.is_available:
+        if book.borrow():
             self.borrowed_books.append(book)
-            book.borrow()
             print(f"{book.title} was borrowed successfully!") 
         else:
             print(f"{book.title} was not availble")
 
 
-    def return_book(self,book):
+    def return_book(self, book):
         if book in self.borrowed_books:
+            if book.return_book():
+                self.borrowed_books.remove(book)
+                return True
+
+        print(f"You haven't borrowed {book.title}")
+        return False    
             
-            book.is_available = True
-            self.borrowed_books.remove(book)
-            print(f"{book.title} returned successfully")
-        else:
-            print(f"you havent borrowed {book.title}")
-            book.is_available = False
 
-member1=Member("hanie", 101)
-print(member1.name)
 
-member1.borrow_book(book1)
-print(member1.borrowed_books)
-member1.return_book(book1)
 
 class Library:
     def __init__ (self):
@@ -73,44 +74,67 @@ class Library:
     def add_book(self, book):
         if book in self.books:
             print("already book exists")
-        else:
-            self.books.append(book)
-            print("the book add seccessfully")
-
+            return False
+        
+        self.books.append(book)
+        print("the book add seccessfully")
+        return True
+    
     def add_member(self, member):
-        if member in self.members:
-            print("This member already exists")
-        else:
-            self.members.append(member)
-            print("Member added successfully")
+        for existing_member in self.members:
+            if existing_member.member_id == member.member_id:
+                print("This member already exists")
+                return False
+
+        self.members.append(member)
+        print("Member added successfully")
+        return True
 
     def find_member(self, member_id):
         for member in self.members:
             if member.member_id == member_id:
                 return member
-            else:
-                return None
+            
+        return None
+    
     def find_book(self, title):
         for book in self.books:
             if book.title == title:
                 return book
         return None
+    
     def search_book(self, keyword):
+        results = []
+
         for book in self.books:
-            if keyword in book.title:
-                return book
-        return None
+            if keyword.lower() in book.title.lower():
+                results.append(book)
+
+        return results
 
     def remove_book(self, title):
         for book in self.books:
             if book.title == title:
-                self.books.remove(book)
-                return True
-        return False
 
-    def remove_member(self, memeber_id):
+                borrowed = False
+
+                for member in self.members:
+                    if book in member.borrowed_books:
+                        borrowed = True
+                        break
+
+                if not borrowed:
+                    self.books.remove(book)
+                    print(f"{title} removed successfully")
+                    return True
+
+        print("No available copy found for this book")
+        return False
+        
+
+    def remove_member(self, member_id):
         for member in self.members:
-            if member.member_id == memeber_id:
+            if member.member_id == member_id:
                  if member.borrowed_books:
                     print("You must return your borrowed books first!")
                     return False
@@ -118,39 +142,17 @@ class Library:
                  self.members.remove(member)
                  print(f"{member.member_id} removed")
                  return True
+        print("Member not found")
         return False
 
-    
-library=Library()
-library.add_book(book1)
-library.add_book(book1)
+    def borrow_book(self, member_id, book):
+        member = self.find_member(member_id)
+        if member is None:
+            print("Mmber not found")
+            return
 
-for book in library.books:
-    print(book.title)
-print(library.books)
-
-library.add_member(member1)
-library.add_member(member1)
-
-member=library.find_member(101)
-print(member.name)
-
-found_book=library.find_book("python basic")
-print(found_book.title)
-print(library.find_book("Unknown"))
-
-search_book=library.search_book("python")
-
-if search_book is not None:
-    print(search_book.title)
-else:
-    print("Book not found") 
-
-
-remove_book=library.remove_book("python basic")
-print(remove_book)
-
-test_member= Member("test", 999)
-library.add_member(test_member)
-test_member.borrow_book(book1)
-print(library.remove_member(999))
+        else:
+            if book in self.books:
+                member.borrow_book(book)
+            else:
+                print("Book not found in Library")
